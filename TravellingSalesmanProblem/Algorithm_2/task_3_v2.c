@@ -10,6 +10,7 @@
 //#define C 5
 
 float Cities[C][2];
+int arr[C];
 
 void printCities(float arr[C][2]){//TYPWNEI TO PERIEXOMENO TOY PINAKA CITIES
 	int i,j;
@@ -27,7 +28,7 @@ void initializeCities(){//AXIKOPOIEI TON PINAKA CITIES ME TYXAIES SYNTETAGMENES
 		float * city = Cities[i];
 		for(j=0;j<2;j++){
 			city[j] = X * (float)rand() / (float)RAND_MAX ;
-			// city[j] = (float)(rand()%X);
+			//  city[j] = (float)(rand()%X);
 		}
 	}
 }
@@ -44,59 +45,44 @@ float EuclDist(float current[2] , float next[2]){//SYNARTHSH POY YPOLOGIZEI THN 
 	
 }
 
-int isVisited(int val , int arr[C], int counter){//SYNARTHSH POY ELEGXEI AN H TIMH VAL BRISKETAI MESA STON ARRAY TOY ORISMATOS
-	int k;
-	for(k=0;k<counter;k++){
-		if(val == arr[k]){
-			return 1;
-		}		
-	}
-	return 0;
-}
+float totalDistance(){
 
-float totalDistance(){//STH SYGKEKRIMENH EKDOSH ELEGXW GIA KATHE POLH POY BRISKOMAI OLES TIS ALLES POLEIS GIA TO AN VRISKONTAI STO PINAKA POY PERILAMVBANEI
-//TIS POLEIS OPY EXW EPISKEFTEI PRAGMA POY APOTELESMA FAINETAI POLLY XRONOBORO
-	
 	int i,j,k;
 	float minDist,dist;	
 	float totaldist = 0.0;
 	float current[2] = {Cities[0][0],Cities[0][1]};
+
+    deleteElement(0,0);
+
 	float next[2];
 	int min_index;//DEIKTHS POY KRATAEI TO INDEX TOY MINDIST
-	int index[C];
-	memset(index, 0,sizeof(index)); 
-	int index_counter = 1;
 	
-	int visited;//METAVLHTH POY ELEGXW AN EXEI GINEI EPISKEPSH SE AYTHN THN POLH MESW THS TIMHS POY EPISTREFEI H SYNARTHS isVisited
-	
-	
-	for(i=0;i<C-1;i++){
-//		printf("index[%d]=%d\n",i,index[i]);
-		minDist = INFINITY;
-		for(j=1;j<C;j++){//EDW TIS ELEGXV OLES TIS ALLES
-			visited = isVisited(j,index,index_counter);
-			if(visited==0){
-				next[0] = Cities[j][0];
-				next[1] = Cities[j][1];
-				dist = EuclDist(current,next);
-//				printf("\t\tINDEX = %d\tDIST(%f,%f) = %f\n",j,current[0],next[0],dist);
-				if(dist<minDist){
-					minDist = dist;
-					min_index = j;
-				}	
-			}
-			
-		}
-		
-//		printf("\t\tMINDIST = %f\n",minDist);
-		totaldist+=minDist;
-		
-		current[0] = Cities[min_index][0];
-		current[1] = Cities[min_index][1];
-		index[i+1] = min_index;
-		index_counter++;
+	int index_counter = 0;
 
+	while(index_counter<C-1){
+		minDist = INFINITY;
+		for(j=0;j<C-index_counter-1;j++){
+			next[0] = Cities[arr[j]][0];
+			next[1] = Cities[arr[j]][1];
+			dist = EuclDist(current,next);
+//			printf("\t\tARR[%d] = %d\tDIST(%f,%f) = %f\n",j,arr[j],current[0],next[0],dist);
+			if(dist<minDist){
+				minDist = dist;
+				min_index = j;
+			}	
+		}
+		totaldist+=minDist;
+//		printf("\t\tMINDIST = %f\n",minDist);
+
+		current[0] = Cities[arr[min_index]][0];
+		current[1] = Cities[arr[min_index]][1];
+		// printf("index_counter = %d\n",index_counter);
+//		printf("MININDEX = %d\n",min_index);		
+		index_counter++;
+        
+		deleteElement(min_index,index_counter);
 	}
+	
 	next[0] = Cities[0][0];
 	next[1] = Cities[0][1];
 	dist = EuclDist(current,next);
@@ -106,10 +92,24 @@ float totalDistance(){//STH SYGKEKRIMENH EKDOSH ELEGXW GIA KATHE POLH POY BRISKO
 	return totaldist;
 }
 
+void deleteElement(int min,int counter){  //AYTH H SYNARTHSH DIAGRAFEI THN POLH APO TO ARRAY arr
+    int i;
+    for (i = min; i < C-counter; i++){
+        arr[i] = arr[i+1];
+    }
+
+}
+
 int main(int argc, char *argv[]) {
 	initializeCities();
 //	printCities(Cities);
+	int i;
+    for(i=0;i<C;i++){
+		arr[i] = i;
+	}
+
 	float totaldist = totalDistance();
 	printf("\nTOTALDIST = %f\t\n",totaldist);
 	return 0;
 }
+

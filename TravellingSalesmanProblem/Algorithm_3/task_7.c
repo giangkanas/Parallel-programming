@@ -54,7 +54,6 @@ float totalDistance(int index){//O SYGKEKRIMENOS ALGORITHMOS DEN EPILEGEI THN PO
 //O SYGKEKRIMENOS ALGORITHMOS EINAI OMWS POLY ARGOS GIA MEGALO PLITHOS POLEWN KAI MEGALO PLHTHOS MYRMHGKIWN
 
     int initial = index;
-
 	float dist;	
 	float totaldist = 0.0;
 	float current[2] = {Cities[index][0],Cities[index][1]};
@@ -62,6 +61,7 @@ float totalDistance(int index){//O SYGKEKRIMENOS ALGORITHMOS DEN EPILEGEI THN PO
     // printf("CURRENT = %d\n\n",index);
     float next[2];
 	int index_counter = 0,j,i;
+    #pragma omp parallel for
     for(i=0;i<C;i++){
 		arr[i] = i;
 	}
@@ -89,6 +89,7 @@ float totalDistance(int index){//O SYGKEKRIMENOS ALGORITHMOS DEN EPILEGEI THN PO
 		}
         
         // putchar('\n');
+        #pragma omp parallel for
         for(j=0;j<C-index_counter-1;j++){
             Probabilistic[j] /= paranomastis;
             // printf("%f\t",Probabilistic[j]);
@@ -97,6 +98,7 @@ float totalDistance(int index){//O SYGKEKRIMENOS ALGORITHMOS DEN EPILEGEI THN PO
 
         for (i = 0; i < C-index_counter-2; i++){
             Cumulative_sum[i]=0.0;
+
             for(j=i;j<C-index_counter-1;j++){
                 Cumulative_sum[i]+=Probabilistic[j];
             }
@@ -128,7 +130,6 @@ float totalDistance(int index){//O SYGKEKRIMENOS ALGORITHMOS DEN EPILEGEI THN PO
 	
 	next[0] = Cities[index][0];
 	next[1] = Cities[index][1];
-    
 	dist = EuclDist(current,next);
     pheromone[index][initial] += 1 / dist;
 	totaldist+=dist;
@@ -161,10 +162,10 @@ int main(int argc, char *argv[]) {
 	initializeCities();
 	// printCities(Cities);
     memset(pheromone,1.0,sizeof(pheromone));
-
-
+    
     int i,j;
     for(j=0;j<iterations;j++){
+        #pragma omp parallel for
         for(i=0;i<ants;i++){
             // printf("ANT = %d\n",i);
             float totaldist = totalDistance(i);
